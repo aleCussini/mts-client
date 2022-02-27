@@ -20,61 +20,55 @@ function createData(key, name, description, releaseVersion, releaseDate, file) {
     return { key, name, description, releaseVersion, releaseDate, file };
 }
 
-function readData(line) {
-   
-}
 
-function MTSTable(props) {
-    let line = props.line;
-    const [rowsCompleted, setRowsComplete] = useState(false);
-    let fetchedRows = [];
-    const db = firebase.db;
-    const updatesRef = ref(db, 'ebridge-' + line);
-    console.log(updatesRef);
-    onValue(updatesRef, (snapshot) => {
-        console.log('into onValue: {}', snapshot.val())
-        let idx = 0;
-        snapshot.forEach((data) => {
-            fetchedRows.push(createData(idx ++, data.val().name, data.val().description, data.val().releaseVersion, data.val().releaseDate, data.val().file));
-        });
-        rows = fetchedRows;
-        setRowsComplete(true);
-    }, { onlyOnce: true });
-    console.log('loaded {}', rows);
-    const classes = makeStyles({
-        table: {
-            minWidth: 650,
-        },
-    });
+class MTSTable extends Component{
 
-    return (
-        
-       rows && <TableContainer component={Paper}>
-            <Table className={classes.table} size="small" aria-label="a dense table">
-                <TableHead>
-                    <TableRow style={{ backgroundColor: "grey" }}>
-                        <TableCell align="left">Nome</TableCell>
-                        <TableCell align="right">Descrizione</TableCell>
-                        <TableCell align="right">Release</TableCell>
-                        <TableCell align="right">Data</TableCell>
-                        <TableCell align="right">Download</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.map((row) => (
-                        <TableRow key={row.key}>
-                            <TableCell align="left">{row.name}</TableCell>
-                            <TableCell align="right">{row.description}</TableCell>
-                            <TableCell align="right">{row.releaseVersion}</TableCell>
-                            <TableCell align="right">{row.releaseDate}</TableCell>
-                            <TableCell align="right">{row.file}</TableCell>
+    constructor(props) {
+        super(props);
+        this.state = {updates: []}
+    }
+
+    componentDidMount() {
+        let fetchedUpdates = [];
+        const db = firebase.db;
+        const updatesRef = ref(db,'ebridge-'+this.props.line);
+        onValue(updatesRef, snapshot => {
+            snapshot.forEach((data) =>{
+                fetchedUpdates.push(data.val());
+            })
+        })
+        this.setState({updates : fetchedUpdates})
+    }
+
+    render() {
+        return(
+           <TableContainer component={Paper}>
+                <Table className='table' size="small" aria-label="a dense table">
+                    <TableHead>
+                        <TableRow style={{ backgroundColor: "grey" }}>
+                            <TableCell align="left">Nome</TableCell>
+                            <TableCell align="right">Descrizione</TableCell>
+                            <TableCell align="right">Release</TableCell>
+                            <TableCell align="right">Data</TableCell>
+                            <TableCell align="right">Download</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                        {this.state.updates.map((update) => (
+                            <TableRow key={update.id}>
+                                <TableCell align="left">{update.name}</TableCell>
+                                <TableCell align="right">{update.description}</TableCell>
+                                <TableCell align="right">{update.releaseVersion}</TableCell>
+                                <TableCell align="right">{update.releaseDate}</TableCell>
+                                <TableCell align="right">{update.file}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )
+    }
 
-    );  
 }
 
 export default MTSTable;
