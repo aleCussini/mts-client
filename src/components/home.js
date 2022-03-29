@@ -8,10 +8,10 @@ class Home extends Component {
     render() {
 
         const user = firebase.auth.currentUser;
-        console.log(user);
+        console.log('current user', user);
 
         return (
-            <div style={{display:"yes"}}>
+            <div>
                 <br/>
                 <h1>Aggiornamenti eBridge</h1>
                 <MTSEbridgeTabs />

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -11,18 +11,19 @@ import firebase from '../firebase/firebase-init';
 import {ref, onValue, query, orderByChild, equalTo, limitToFirst} from 'firebase/database';
 
 function TabPanel(props) {
-    const {children, value, index, ...other } = props;
+    const { children, value, index, ...other } = props;
+
     return (
         <div
             role="tabpanel"
             hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
+            id={`full-width-tabpanel-${index}`}
+            aria-labelledby={`full-width-tab-${index}`}
             {...other}
         >
             {value === index && (
-                <Box p={3}>
-                    <Typography component={'span'}>{children}</Typography>
+                <Box sx={{ p: 3 }}>
+                    <Typography>{children}</Typography>
                 </Box>
             )}
         </div>
@@ -37,90 +38,71 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
     return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
     };
 }
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
-    },
-}));
 
-export default class MTSEbridgeTabs extends Component{
 
-    constructor(props) {
-        super(props);
-        this.state = {value: 0, customerUpdates: []}
-    }
+export default function MTSEbridgeTabs() {
 
-    handleChange(e)  {
-        alert(e.target.value)
+    const theme = useTheme();
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+    const handleChangeIndex = (index) => {
+        setValue(index);
     };
 
-    componentDidMount() {
-        let fetchedCustomerUpdates = [];
-        let user = firebase.auth.currentUser;
-        if(user){
-            let customersRef = query(ref(firebase.db,'customers'),orderByChild('email'), equalTo(user.email), limitToFirst(1));
-            onValue(customersRef,(customersFetched)=>{
-                customersFetched.forEach(customer => {
-                    console.log('customer updates: ', customer.val().updates)
-                    this.setState({...this.state,customerUpdates: customer.val().updates});
-                })
-            })
-        }
-    }
+    return (
 
-    render() {
-        return (
+        <div className='root'>
+            <AppBar position="static">
+                <Tabs value={value} onChange={handleChange} aria-label="simple tabs example" variant="scrollable" scrollButtons="auto">
+                    <Tab label="Azienda" {...a11yProps(0)} />
+                    <Tab label="Contabilità" {...a11yProps(1)} />
+                    <Tab label="Dichiarativi" {...a11yProps(2)} />
+                    <Tab label="Bilancio" {...a11yProps(3)} />
+                    <Tab label="Lavoro" {...a11yProps(4)} />
+                    <Tab label="Modelli Comunicazione" {...a11yProps(5)} />
+                    <Tab label="Soluzioni Integrate" {...a11yProps(6)} />
+                    <Tab label="Modulario" {...a11yProps(7)} />
+                    <Tab label="Condominio" {...a11yProps(8)} />
+                </Tabs>
+            </AppBar>
+            <TabPanel value={value} index={0}>
+                <MTSTable line='azienda'/>
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                <MTSTable line='contabilita'/>
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                <MTSTable line='dichiarativi'/>
+            </TabPanel>
+            <TabPanel value={value} index={3}>
+                <MTSTable line='bilancio'/>
+            </TabPanel>
+            <TabPanel value={value} index={4}>
+                <MTSTable line='lavoro'/>
+            </TabPanel>
+            <TabPanel value={value} index={5}>
+                <MTSTable line='comunicazione'/>
+            </TabPanel>
+            <TabPanel value={value} index={6}>
+                <MTSTable line='soluzioni'/>
+            </TabPanel>
+            <TabPanel value={value} index={7}>
+                <MTSTable line='modulario'/>
+            </TabPanel>
+            <TabPanel value={value} index={8}>
+                <MTSTable line='condominio'/>
+            </TabPanel>
+        </div>
+    );
 
-            <div className='root'>
-                <AppBar position="static">
-                    <Tabs value={this.state.value} onChange={this.handleChange} aria-label="simple tabs example" variant="scrollable" scrollButtons="auto">
-                        <Tab label="Azienda" {...a11yProps(0)} />
-                        <Tab label="Contabilità" {...a11yProps(1)} />
-                        <Tab label="Dichiarativi" {...a11yProps(2)} />
-                        <Tab label="Bilancio" {...a11yProps(3)} />
-                        <Tab label="Lavoro" {...a11yProps(4)} />
-                        <Tab label="Modelli Comunicazione" {...a11yProps(5)} />
-                        <Tab label="Soluzioni Integrate" {...a11yProps(6)} />
-                        <Tab label="Modulario" {...a11yProps(7)} />
-                        <Tab label="Condominio" {...a11yProps(8)} />
-                    </Tabs>
-                </AppBar>
-                <TabPanel value={this.state.value} index={0}>
-                    <MTSTable line='azienda'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={1}>
-                    <MTSTable line='contabilita'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={2}>
-                    <MTSTable line='dichiarativi'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={3}>
-                    <MTSTable line='bilancio'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={4}>
-                    <MTSTable line='lavoro'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={5}>
-                    <MTSTable line='comunicazione'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={6}>
-                    <MTSTable line='soluzioni'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={7}>
-                    <MTSTable line='modulario'/>
-                </TabPanel>
-                <TabPanel value={this.state.value} index={8}>
-                    <MTSTable line='condominio'/>
-                </TabPanel>
-            </div>
-        );
-    }
 
 
 
