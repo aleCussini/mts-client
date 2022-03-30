@@ -7,7 +7,8 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { render } from 'react-dom';
+import Button from '@material-ui/core/Button';
+import { OpenInBrowser} from "@mui/icons-material";
 import firebase from '../firebase/firebase-init';
 import { ref, onValue } from 'firebase/database';
 
@@ -48,7 +49,8 @@ class MTSUtilityTable extends Component {
                          {this.state.rows.map((row) => (
                              <TableRow key={row.id}>
                                  <TableCell align="left">{row.description}</TableCell>
-                                 <TableCell align="right">{row.link}</TableCell>
+                                 <TableCell align="right">
+                                     <Button variant="outlined" href={row.link}> <OpenInBrowser/></Button></TableCell>
                              </TableRow>
                          ))}
                      </TableBody>

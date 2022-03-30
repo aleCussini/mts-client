@@ -7,10 +7,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { render } from 'react-dom';
 import firebase from '../firebase/firebase-init';
 import { ref, onValue } from 'firebase/database';
-import { SettingsInputAntennaTwoTone, SettingsSystemDaydreamTwoTone } from '@material-ui/icons';
+import Button from '@material-ui/core/Button';
+import { FileDownload} from "@mui/icons-material";
 
 const lines = ['azienda', 'contabilita', 'dichiarativi', 'bilancio', 'lavoro', 'comunicazione', 'soluzioni', 'modulario', 'condominio'];
 
@@ -57,10 +57,15 @@ class MTSTable extends Component{
                         {this.state.updates.map((update) => (
                             <TableRow key={update.id}>
                                 <TableCell align="left">{update.name}</TableCell>
-                                <TableCell align="right">{update.description}</TableCell>
+                                <TableCell align="left">{update.description}</TableCell>
                                 <TableCell align="right">{update.releaseVersion}</TableCell>
                                 <TableCell align="right">{update.releaseDate}</TableCell>
-                                <TableCell align="right">{update.file}</TableCell>
+                                <TableCell align="right">
+                                    <Button variant="outlined" href={update.file}>
+                                        <FileDownload />
+                                    </Button>
+                                </TableCell>
+                                {/*<TableCell align="right">{update.file}</TableCell>*/}
                             </TableRow>
                         ))}
                     </TableBody>
